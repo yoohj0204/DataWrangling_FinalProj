@@ -1,0 +1,77 @@
+---
+title: "Final project"
+author: "Xing Cheng"
+date: "11/05/2021"
+output: pdf_document
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+#install.packages("tidycensus")
+library(tidycensus)
+library(httr) 
+library(jsonlite)
+#install.packages("sqldf")
+library(sqldf)
+library(tidyverse)
+```
+
+```{r}
+# I will figure out API later
+# res2019 = GET("https://data.medicaid.gov/dataset/e36d89c0-f62e- 56d5-bc7e-b0adf89262b8")
+# res2020=GET("https://data.medicaid.gov/dataset/fbbe1734-b448-4e5a-bc94-3f8688534741")
+# data2019=fromJSON(rawToChar(res2019$content))
+
+```
+
+
+
+```{r}
+data2019=read.csv("/Users/xing/Desktop/QBS 181/2019data.csv")
+data2020=read.csv("/Users/xing/Desktop/QBS 181/2020data.csv")
+
+data=sqldf("select * from data2019
+      union
+      select * from data2020")
+
+```
+
+```{r}
+#Remove dot from column names
+names(data) <- gsub("\\.", "", names(data))
+names(data)
+```
+
+
+```{r}
+#Table for kate
+higher=sqldf("select State, avg(StateRate) as StateRate_mean
+from data
+where MeasureType like 'Higher%'
+group by State
+order by StateRate_mean desc
+      ")
+
+lower=sqldf("select State, avg(StateRate) as StateRate_mean
+from data
+where MeasureType like 'Lower%'
+group by State
+order by StateRate_mean 
+      ")
+```
+
+```{r}
+
+```
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
