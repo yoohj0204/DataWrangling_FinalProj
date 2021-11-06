@@ -1,14 +1,11 @@
 ---
 title: "Final project"
-author: "Xing Cheng"
-date: "11/05/2021"
+author: "Xing Cheng, Jihyun Lee"
+date: "11/06/2021"
 output: pdf_document
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
+[Xing]
 ```{r}
 #install.packages("tidycensus")
 library(tidycensus)
@@ -30,8 +27,10 @@ library(tidyverse)
 
 
 ```{r}
-data2019=read.csv("/Users/xing/Desktop/QBS 181/2019data.csv")
-data2020=read.csv("/Users/xing/Desktop/QBS 181/2020data.csv")
+#I made some changes here but feel free to change this chunk to run in your computer
+setwd("~/Desktop/QBS181/finalProject/DataWrangling_FinalProj")
+data2019=read.csv("2019data.csv")
+data2020=read.csv("2020data.csv")
 
 data=sqldf("select * from data2019
       union
@@ -63,15 +62,119 @@ order by StateRate_mean
       ")
 ```
 
-```{r}
+
+[Jihyun]
+I have two parts, 1: higher is better, made two separate columns 2019 and 2020 to compare. 2: lower is better. 
+My code will generate new csv files, Hannah will generate the bar graphs to compare two average state rates.
+
+Average state rate for "higher is better" in **2019 and 2020**
+```{r fig.show = 'hold', out.width = '50%'}
+names(data2019) <- gsub("\\.", "", names(data2019))
+#names(data2019)
+
+higher2019=sqldf("select State, avg(StateRate) as StateRate_mean
+from data2019
+where MeasureType like 'Higher%'
+group by State
+order by StateRate_mean desc
+      ")
+
+par(mar = c(7, 4, 2, 2) + 0.2)
+end_point = 0.5 + nrow(higher2019) + nrow(higher2019) - 1
+barplot(higher2019$StateRate_mean, col = "grey50", 
+        main = "",
+        ylab = "2019 State Mean (higher is better)", ylim = c(0,70),
+        xlab = "",
+        space = 1)
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+     srt = 60, adj = 1, xpd = TRUE,
+     labels = paste(higher2019$State), cex = 0.65)
+
+names(data2020) <- gsub("\\.", "", names(data2020))
+
+higher2020=sqldf("select State, avg(StateRate) as StateRate_mean
+from data2020
+where MeasureType like 'Higher%'
+group by State
+order by StateRate_mean desc
+      ")
+
+par(mar = c(7, 4, 2, 2) + 0.2)
+end_point = 0.5 + nrow(higher2020) + nrow(higher2020) - 1
+barplot(higher2019$StateRate_mean, col = "lightblue", 
+        main = "",
+        ylab = "2020 State Mean (higher is better)", ylim = c(0,70),
+        xlab = "",
+        space = 1)
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+     srt = 60, adj = 1, xpd = TRUE,
+     labels = paste(higher2020$State), cex = 0.65)
+
+h2019 <- higher2019[order(higher2019$State),]
+h2020 <- higher2020[order(higher2020$State),]
+h2020<- h2020[-40,] #I dropped Pueto Rico because 2019 data doesn't have Pueto Rico.
+
+higher2019_2020<- h2019
+higher2019_2020$StateRate_mean_2020<-h2020$StateRate_mean
+colnames(higher2019_2020)[2] <- "StateRate_mean_2019"
+
+write.csv(higher2019_2020,"higherbetter_StateRateMean_2019_2020_combine.csv", row.names = FALSE)
+
 
 ```
 
+Average state rate for "lower is better" in 2019
+```{r fig.show = 'hold', out.width = '32%'}
+#names(data2019) <- gsub("\\.", "", names(data2019))
+#names(data2019)
+
+lower2019=sqldf("select State, avg(StateRate) as StateRate_mean
+from data2019
+where MeasureType like 'Lower%'
+group by State
+order by StateRate_mean desc
+      ")
+
+par(mar = c(7, 4, 2, 2) + 0.2)
+end_point = 0.5 + nrow(lower2019) + nrow(lower2019) - 1
+barplot(lower2019$StateRate_mean, col = "grey50", 
+        main = "",
+        ylab = "2019 State Mean (lower is better)", ylim = c(0,70),
+        xlab = "",
+        space = 1)
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+     srt = 60, adj = 1, xpd = TRUE,
+     labels = paste(lower2019$State), cex = 0.65)
+
+#names(data2020) <- gsub("\\.", "", names(data2020))
+
+lower2020=sqldf("select State, avg(StateRate) as StateRate_mean
+from data2020
+where MeasureType like 'Lower%'
+group by State
+order by StateRate_mean desc
+      ")
+
+par(mar = c(7, 4, 2, 2) + 0.2)
+end_point = 0.5 + nrow(lower2020) + nrow(lower2020) - 1
+barplot(lower2019$StateRate_mean, col = "lightblue", 
+        main = "",
+        ylab = "2020 State Mean (lower is better)", ylim = c(0,70),
+        xlab = "",
+        space = 1)
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+     srt = 60, adj = 1, xpd = TRUE,
+     labels = paste(lower2020$State), cex = 0.65)
+
+l2019 <- lower2019[order(lower2019$State),]
+l2020 <- lower2020[order(lower2020$State),]
+l2020<- l2020[-40,] #I dropped Pueto Rico because 2019 data doesn't have Pueto Rico.
+
+lower2019_2020<- l2019
+lower2019_2020$StateRate_mean_2020<-l2020$StateRate_mean
+colnames(lower2019_2020)[2] <- "StateRate_mean_2019"
+
+write.csv(lower2019_2020,"lowerbetter_StateRateMean_2019_2020_combine.csv", row.names = FALSE)
 
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
-
+```
