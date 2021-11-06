@@ -123,7 +123,8 @@ write.csv(higher2019_2020,"higherbetter_StateRateMean_2019_2020_combine.csv", ro
 
 ```
 
-Average state rate for "lower is better" in 2019
+Average state rate for "lower is better" in 2019 and 2020
+
 ```{r fig.show = 'hold', out.width = '32%'}
 #names(data2019) <- gsub("\\.", "", names(data2019))
 #names(data2019)
