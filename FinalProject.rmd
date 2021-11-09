@@ -1,7 +1,7 @@
 ---
 title: "Final project"
-author: "Xing Cheng, Jihyun Lee"
-date: "11/06/2021"
+author: "Xing Cheng, Jihyun Lee, Hyunjoe Yoo"
+date: "11/11/2021"
 output: pdf_document
 ---
 
@@ -9,7 +9,7 @@ output: pdf_document
 ```{r}
 #install.packages("tidycensus")
 library(tidycensus)
-library(httr) 
+library(httr)
 library(jsonlite)
 #install.packages("sqldf")
 library(sqldf)
@@ -58,13 +58,13 @@ lower=sqldf("select State, avg(StateRate) as StateRate_mean
 from data
 where MeasureType like 'Lower%'
 group by State
-order by StateRate_mean 
+order by StateRate_mean
       ")
 ```
 
 
 [Jihyun]
-I have two parts, 1: higher is better, made two separate columns 2019 and 2020 to compare. 2: lower is better. 
+I have two parts, 1: higher is better, made two separate columns 2019 and 2020 to compare. 2: lower is better.
 My code will generate new csv files, Hannah will generate the bar graphs to compare two average state rates.
 
 Average state rate for "higher is better" in **2019 and 2020**
@@ -81,12 +81,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(higher2019) + nrow(higher2019) - 1
-barplot(higher2019$StateRate_mean, col = "grey50", 
+barplot(higher2019$StateRate_mean, col = "grey50",
         main = "",
         ylab = "2019 State Mean (higher is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(higher2019$State), cex = 0.65)
 
@@ -101,12 +101,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(higher2020) + nrow(higher2020) - 1
-barplot(higher2019$StateRate_mean, col = "lightblue", 
+barplot(higher2019$StateRate_mean, col = "lightblue",
         main = "",
         ylab = "2020 State Mean (higher is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(higher2020$State), cex = 0.65)
 
@@ -138,12 +138,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(lower2019) + nrow(lower2019) - 1
-barplot(lower2019$StateRate_mean, col = "grey50", 
+barplot(lower2019$StateRate_mean, col = "grey50",
         main = "",
         ylab = "2019 State Mean (lower is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(lower2019$State), cex = 0.65)
 
@@ -158,12 +158,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(lower2020) + nrow(lower2020) - 1
-barplot(lower2019$StateRate_mean, col = "lightblue", 
+barplot(lower2019$StateRate_mean, col = "lightblue",
         main = "",
         ylab = "2020 State Mean (lower is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(lower2020$State), cex = 0.65)
 
