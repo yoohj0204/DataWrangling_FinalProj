@@ -41,7 +41,7 @@ data19.isnull().values.any()
 #checking where the value is: 3017 and 42 missing values in Notes and Rate column
 data19.isnull().sum()
 
-#3450-3387=63, so dropped rows of 63 Non reported state rate 
+#3450-3387=63, so dropped rows of 63 Non reported state rate
 data20.rename(columns={'State Rate': 'StateRate'}, inplace=True)
 data20=data20[~data20.StateRate.str.contains("NR")]
 data20
@@ -50,7 +50,7 @@ data20_trim = data20[['State', 'Reporting Program', 'StateRate']]
 data20_trim.head()
 #trimmed 2020 data - only necessary columns for calculations
 
-#3450-3387=63, so dropped rows of 63 Non reported state rate 
+#3450-3387=63, so dropped rows of 63 Non reported state rate
 data19.rename(columns={'State Rate': 'StateRate'}, inplace=True)
 data19=data19[~data19.StateRate.str.contains("NR")]
 data19
@@ -82,7 +82,7 @@ data_a_rank=data20_trim_adult.copy()
 #data_a_rank['rank']=data20_trim_adult.groupby('StateRate').rank()
 
 data_a_rank.sort_values("StateRate", inplace = True)
-  
+
 # creating a rank column and passing the returned rank
 data_a_rank["Rank"] = data_a_rank["StateRate"].rank()
 data_a_rank.sort_values("Rank", inplace = True)
@@ -100,7 +100,7 @@ data_c_rank=data20_trim_child.copy()
 #data_a_rank['rank']=data20_trim_adult.groupby('StateRate').rank()
 
 data_c_rank.sort_values("StateRate", inplace = True)
-  
+
 # creating a rank column and passing the returned rank
 data_c_rank["Rank"] = data_c_rank["StateRate"].rank()
 data_c_rank.sort_values("Rank", inplace = True)
@@ -118,7 +118,7 @@ data_a_rank_19=data19_trim_adult.copy()
 #data_a_rank['rank']=data20_trim_adult.groupby('StateRate').rank()
 
 data_a_rank_19.sort_values("StateRate", inplace = True)
-  
+
 # creating a rank column and passing the returned rank
 data_a_rank_19["Rank"] = data_a_rank_19["StateRate"].rank()
 data_a_rank_19.sort_values("Rank", inplace = True)
@@ -127,7 +127,7 @@ data_a_rank_19.groupby("Rank")
 
 data_a_rank_19
 
-#Count the number of occurrences of each state in top 10% for 2020 adult data
+#Count the number of occurrences of each state in top 10% for 2019 adult data
 data_a_rank_19_10 = data_a_rank_19.head(142)
 data_a_rank_19_10
 data_a_rank_19_10['State'].value_counts()
@@ -136,7 +136,7 @@ data_c_rank_19=data19_trim_child.copy()
 #data_a_rank['rank']=data20_trim_adult.groupby('StateRate').rank()
 
 data_c_rank_19.sort_values("StateRate", inplace = True)
-  
+
 # creating a rank column and passing the returned rank
 data_c_rank_19["Rank"] = data_c_rank_19["StateRate"].rank()
 data_c_rank_19.sort_values("Rank", inplace = True)
