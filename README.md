@@ -9,7 +9,8 @@ We want to compare how healthcare quality is measured across different states, a
 
 We want to see how insurance coverage affects the measures chosen and reported on per state, as well as what methodology is chosen for the measure, and how coverage affects this.
 
-
+**final_project_hw**
+Plots comparing average state rates between 2019 and 2020 and the average state rates of a random sample of states. Additionally a plot showing the mean number of states reporing measures in each domain.
 
 **Python Script**
 
