@@ -1,7 +1,7 @@
 ---
 title: "Final project"
-author: "Xing Cheng, Jihyun Lee"
-date: "11/06/2021"
+author: "Xing Cheng, Jihyun Lee, Hyunjoe Yoo"
+date: "11/10/2021"
 output: pdf_document
 ---
 
@@ -9,7 +9,7 @@ output: pdf_document
 ```{r}
 #install.packages("tidycensus")
 library(tidycensus)
-library(httr) 
+library(httr)
 library(jsonlite)
 #install.packages("sqldf")
 library(sqldf)
@@ -18,53 +18,92 @@ library(tidyverse)
 
 ```{r}
 # I will figure out API later
-# res2019 = GET("https://data.medicaid.gov/dataset/e36d89c0-f62e- 56d5-bc7e-b0adf89262b8")
-# res2020=GET("https://data.medicaid.gov/dataset/fbbe1734-b448-4e5a-bc94-3f8688534741")
-# data2019=fromJSON(rawToChar(res2019$content))
+res2019 = GET("https://data.medicaid.gov/api/1/metastore/schemas/dataset/items/e36d89c0-f62e-56d5-bc7e-b0adf89262b8?show-reference-ids=false")
+res2019=fromJSON(rawToChar(res2019$content))
+downloadURL2019=res2019$distribution$data$downloadURL
+data2019=read.csv(downloadURL2019)
 
+res2020=GET("https://data.medicaid.gov/api/1/metastore/schemas/dataset/items/fbbe1734-b448-4e5a-bc94-3f8688534741?show-reference-ids=false")
+res2020=fromJSON(rawToChar(res2020$content))
+downloadURL2020=res2020$distribution$data$downloadURL
+data2020=read.csv(downloadURL2020)
 ```
+
 
 
 
 ```{r}
-#I made some changes here but feel free to change this chunk to run in your computer
-setwd("~/Desktop/QBS181/finalProject/DataWrangling_FinalProj")
-data2019=read.csv("2019data.csv")
-data2020=read.csv("2020data.csv")
-
 data=sqldf("select * from data2019
-      union
+      union all
       select * from data2020")
-
 ```
+
 
 ```{r}
 #Remove dot from column names
 names(data) <- gsub("\\.", "", names(data))
 names(data)
 ```
+Investigated data using excel, I found the column Source is constant value 
+```{r}
+SourceAbb=sqldf("
+select *, row_number() over (order by FFY,Source) as source_id
+from
+(select distinct FFY, Source from data) temp")
+
+```
+
+```{r}
+MeasureInfo=sqldf("
+select distinct MeasureAbbreviation, ReportingProgram, Domain, MeasureName, MeasureType, RateDefinition
+from data
+              ")
+```
+
+```{r}
+StateReport=sqldf("select State, MeasureAbbreviation, data.FFY, source_id, Population, Methodology, StateRate, NumberofStatesReporting, Median, BottomQuartile, TopQuartile, Notes, StateSpecificComments, RateUsedinCalculatingStateMeanandMedian
+      from data, SourceAbb
+      where data.FFY=SourceAbb.FFY and data.Source=SourceAbb.Source")
+```
 
 
 ```{r}
-#Table for kate
-higher=sqldf("select State, avg(StateRate) as StateRate_mean
+#install.packages("usmap")
+library(usmap)
+library(ggplot2)
+
+State_report_freq_2020=sqldf("
+select State as state, count(State) as report_freq
 from data
-where MeasureType like 'Higher%'
+where FFY=2020
 group by State
-order by StateRate_mean desc
+order by report_freq desc
       ")
 
-lower=sqldf("select State, avg(StateRate) as StateRate_mean
+plot_usmap(data=State_report_freq,values='report_freq',color="red")+
+  scale_fill_continuous(low="white",high="blue",name="report freq 2020",label=scales::comma)+
+  theme(legend.position='right')
+```
+
+```{r}
+State_report_freq_2019=sqldf("
+select State as state, count(State) as report_freq
 from data
-where MeasureType like 'Lower%'
+where FFY=2019
 group by State
-order by StateRate_mean 
+order by report_freq desc
       ")
+
+plot_usmap(data=State_report_freq,values='report_freq',color="red")+
+  scale_fill_continuous(low="white",high="blue",name="report freq 2019",label=scales::comma)+
+  theme(legend.position='right')
+
+
 ```
 
 
 [Jihyun]
-I have two parts, 1: higher is better, made two separate columns 2019 and 2020 to compare. 2: lower is better. 
+I have two parts, 1: higher is better, made two separate columns 2019 and 2020 to compare. 2: lower is better.
 My code will generate new csv files, Hannah will generate the bar graphs to compare two average state rates.
 
 Average state rate for "higher is better" in **2019 and 2020**
@@ -81,12 +120,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(higher2019) + nrow(higher2019) - 1
-barplot(higher2019$StateRate_mean, col = "grey50", 
+barplot(higher2019$StateRate_mean, col = "grey50",
         main = "",
         ylab = "2019 State Mean (higher is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(higher2019$State), cex = 0.65)
 
@@ -101,12 +140,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(higher2020) + nrow(higher2020) - 1
-barplot(higher2019$StateRate_mean, col = "lightblue", 
+barplot(higher2019$StateRate_mean, col = "lightblue",
         main = "",
         ylab = "2020 State Mean (higher is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(higher2020$State), cex = 0.65)
 
@@ -138,12 +177,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(lower2019) + nrow(lower2019) - 1
-barplot(lower2019$StateRate_mean, col = "grey50", 
+barplot(lower2019$StateRate_mean, col = "grey50",
         main = "",
         ylab = "2019 State Mean (lower is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(lower2019$State), cex = 0.65)
 
@@ -158,12 +197,12 @@ order by StateRate_mean desc
 
 par(mar = c(7, 4, 2, 2) + 0.2)
 end_point = 0.5 + nrow(lower2020) + nrow(lower2020) - 1
-barplot(lower2019$StateRate_mean, col = "lightblue", 
+barplot(lower2019$StateRate_mean, col = "lightblue",
         main = "",
         ylab = "2020 State Mean (lower is better)", ylim = c(0,70),
         xlab = "",
         space = 1)
-text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25, 
+text(seq(1.5, end_point, by = 2), par("usr")[3]-0.25,
      srt = 60, adj = 1, xpd = TRUE,
      labels = paste(lower2020$State), cex = 0.65)
 
