@@ -1,7 +1,7 @@
 ---
 title: "Final project"
 author: "Xing Cheng, Jihyun Lee, Hyunjoe Yoo"
-date: "11/11/2021"
+date: "11/10/2021"
 output: pdf_document
 ---
 
@@ -18,25 +18,26 @@ library(tidyverse)
 
 ```{r}
 # I will figure out API later
-# res2019 = GET("https://data.medicaid.gov/dataset/e36d89c0-f62e- 56d5-bc7e-b0adf89262b8")
-# res2020=GET("https://data.medicaid.gov/dataset/fbbe1734-b448-4e5a-bc94-3f8688534741")
-# data2019=fromJSON(rawToChar(res2019$content))
+res2019 = GET("https://data.medicaid.gov/api/1/metastore/schemas/dataset/items/e36d89c0-f62e-56d5-bc7e-b0adf89262b8?show-reference-ids=false")
+res2019=fromJSON(rawToChar(res2019$content))
+downloadURL2019=res2019$distribution$data$downloadURL
+data2019=read.csv(downloadURL2019)
 
+res2020=GET("https://data.medicaid.gov/api/1/metastore/schemas/dataset/items/fbbe1734-b448-4e5a-bc94-3f8688534741?show-reference-ids=false")
+res2020=fromJSON(rawToChar(res2020$content))
+downloadURL2020=res2020$distribution$data$downloadURL
+data2020=read.csv(downloadURL2020)
 ```
+
 
 
 
 ```{r}
-#I made some changes here but feel free to change this chunk to run in your computer
-setwd("/Users/xing/Desktop/QBS 181")
-data2019=read.csv("2019data.csv")
-data2020=read.csv("2020data.csv")
-
 data=sqldf("select * from data2019
       union all
       select * from data2020")
-
 ```
+
 
 ```{r}
 #Remove dot from column names
