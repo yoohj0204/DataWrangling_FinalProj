@@ -1,4 +1,4 @@
-# DataWrangling_FinalProj
+# QBS 181 Data Wrangling Final Project
 
 **Dataset and Analysis**
 
