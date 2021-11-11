@@ -14,8 +14,8 @@ Plots comparing average state rates between 2019 and 2020 and the average state 
 
 **Python Script**
 
-Hyunjoe_QBS181.py is a Python program (on google colab) that displays the states with top 10% State Rate value and ranks the states based on State Rate of the data.
-Top 10% States with top 10% value from the set is calculated for each dataset - 2020 adult data, 2020 children data, 2019 adult data, and 2019 children data.
+hyunjoe_qbq181.py is a Python program (on google colab) that displays the states with top 10% State Rate value and ranks the states based on State Rate of the data.
+Top 10% States with top 10% value from the set is calculated for each dataset if the high value is a better measurement for 2020 adult data, 2020 children data, 2019 adult data, and 2019 children data.
 
 
 
