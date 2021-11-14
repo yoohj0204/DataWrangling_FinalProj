@@ -1,6 +1,6 @@
 ---
 title: "Final project"
-author: "Xing Cheng, Jihyun Lee, Hyunjoe Yoo"
+author: "Xing Cheng, Jihyun Lee, Hyunjoe Yoo, Avani Kuthe, Hanna Whitehouse"
 date: "11/10/2021"
 output: pdf_document
 ---
