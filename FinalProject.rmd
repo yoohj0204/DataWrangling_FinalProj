@@ -179,3 +179,278 @@ write.csv(lower2019_2020,"lowerbetter_StateRateMean_2019_2020_combine.csv", row.
 
 
 ```
+### Avani
+As per a few chosen measures in each domain, how does insurance coverage affect the measures 
+reported on per state? What methodology is chosen for the measure, and how does coverage affect 
+this? Does it change from 2019 to 2020? 
+
+```{r}
+#library(sqldf)
+#library(tidyverse)
+```
+
+```{r}
+data.ins <- sqldf("select * from X2019data
+      union
+      select * from X2020data")
+```
+Looking at what the domains are available in the dataset
+
+```{r}
+data.ins$Domain <- as.factor(data.ins$Domain)
+class(data.ins$Domain)
+levels(data.ins$Domain)
+```
+
+Looking at what measures are present in domain
+```{r}
+data.ins$State <- as.factor(data.ins$State)
+data.ins$`Reporting Program` <-as.factor(data.ins$`Reporting Program`)
+data.ins$`Measure Name` <- as.factor(data.ins$`Measure Name`)
+data.ins$`Measure Abbreviation` <- as.factor(data.ins$`Measure Abbreviation`)
+data.ins$`Measure Type` <- as.factor(data.ins$`Measure Type`)
+data.ins$FFY <- as.factor(data.ins$FFY)
+data.ins$Population <- as.factor(data.ins$Population)
+data.ins$Methodology <- as.factor(data.ins$Methodology)
+
+
+```
+```{r}
+filter(data.ins, Domain == "Behavioral Health Care") %>%
+  distinct(`Measure Name`)
+```
+
+```{r}
+filter(data.ins, Domain == "Dental and Oral Health Services") %>%
+  distinct(`Measure Name`)
+```
+```{r}
+filter(data.ins, Domain == "Maternal and Perinatal Health") %>%
+  distinct(`Measure Name`)
+```
+```{r}
+filter(data.ins, Domain == "Care of Acute and Chronic Conditions") %>%
+  distinct(`Measure Name`)
+```
+```{r}
+filter(data.ins, Domain == "Long-Term Services and Supports") %>%
+  distinct(`Measure Name`)
+```
+```{r}
+filter(data.ins, Domain == "Primary Care Access and Preventive Care") %>%
+  distinct(`Measure Name`)
+```
+For the purpose of this project, I'll be looking through a select number of measures. To do this, 
+I'll be creating a new table with only these chosen measures
+
+```{r}
+chosen.measures <- c("Antidepressant Medication Management: Age 18 and Older", "Follow-Up After Hospitalization for Mental Illness: Age 18 and Older", "Percentage of Eligibles Who Received Preventive Dental Services: Ages 1 to 20", "Contraceptive Care: All Women Ages 21 to 44", "Prenatal and Postpartum Care: Postpartum Care", "Annual Monitoring for Patients on Persistent Medications: Age 18 and Older", "Comprehensive Diabetes Care: Hemoglobin A1c Poor Control (>9.0%): Ages 18 to 75", "National Core Indicators Survey: Age 18 and Older", "Flu Vaccinations for Adults Ages 18 to 64", "Immunizations for Adolescents: Age 13")
+data.q <- data.ins %>%
+  filter(`Measure Name` %in% chosen.measures)
+
+head(data.q)
+```
+Now we'll look at the insurance types, which is represented in the "Population" column
+
+```{r}
+levels(data.q$Population)
+```
+CHIP - Childrens Health Insurance Program
+Dual Eligibles - dual eligibility for both medicaid and medicare 
+For the purposes of this project, we'll look at "Medicaid & CHIP", "Medicaid & CHIP & Dual 
+Eligibles", and "Medicaid only"
+
+We notice that not all measures are represented in all states, so we can look into this
+
+```{r}
+st.cnt <- data.q %>% 
+  filter(`Measure Name` == "Antidepressant Medication Management: Age 18 and Older") %>%
+  distinct(State)
+
+st.cntr <- st.cnt$State
+
+length(st.cntr)  
+```
+In this example, we can see that not all fifty states use this measure. We can look at the rest of 
+the measures
+
+```{r}
+count.hold <- c()
+for (i in 1:10) {
+  st.cnt <- data.q %>% 
+    filter(`Measure Name` == chosen.measures[i]) %>%
+    distinct(State)
+
+  st.cntr <- st.cnt$State
+
+  len.st <- length(st.cntr)
+  
+  count.hold <- c(count.hold, len.st)
+}
+
+st.num <- data.frame(chosen.measures, count.hold)
+st.num
+```
+```{r}
+library(ggplot2)
+```
+```{r}
+p1 <- ggplot(data = st.num, aes(x=count.hold, y=chosen.measures)) +
+  geom_bar(stat = "identity", color = "light blue", fill = "light blue") +
+  geom_text(aes(label=count.hold), vjust=-0.3, size=3.5) +
+  labs(y="Measures", x="Count of States Reporting Measure")
+  theme_minimal()
+
+p1
+ggsave("CountStatesReportingMeasures.png")
+```
+plot count of measure (out of the ten) by populations
+First, we'll look at the different insurance populations 
+```{r}
+levels(data.q$Population)
+```
+From here, we'll look at frequency of our measures per populations
+```{r}
+pops <- c("CHIP only", "Medicaid & CHIP", "Medicaid & Dual Eligibles", "Medicaid", "Medicaid & CHIP & Dual Eligibles", "Medicaid only")
+
+m.hold <- c()
+
+for (i in 1:6) {
+  m <- data.q %>% 
+    filter(Population == pops[i]) %>%
+    distinct(`Measure Name`)
+  
+  m.cnt <- m$`Measure Name`
+  
+  len.m <- length(m.cnt)
+  
+  m.hold <- c(m.hold, len.m)
+}
+
+m.num <- data.frame(pops, m.hold)
+m.num
+
+p2 <- ggplot(data = m.num, aes(x=m.hold, y=pops)) +
+  geom_bar(stat = "identity", color = "light blue", fill = "light blue") +
+  geom_text(aes(label=m.hold), vjust=-0.3, size=3.5) +
+  labs(y="Governmental Healthcare Populations", x="Count of Marker Measures")
+  theme_minimal()
+  
+p2
+
+ggsave("HealthcarePopulationsPerMeasures.png")
+```
+Not all coverage populations report on all measures. We can look into this by looking at which 
+specific markers are reported bypopulations
+```{r}
+for (i in 1:6) {
+  pop1 <- data.q %>%
+    filter(Population == pops[i]) %>%
+    distinct(`Measure Name`)
+  print(pops[i])
+  print(pop1$`Measure Name`)
+}
+```
+We see that Medicaid and CHIP together represent the populations where the most measures were 
+taken. We can reason that this is because this is representative of the biggest subset of the
+population under government healthcare insurance.
+
+
+Go into diff types of coverage in governmental insurance 
+Within these populations, we see that there are different types of delivery systems of healthcare 
+coverage. We can see the effect these types of delivery systems will have on what measures are 
+reported by states
+
+```{r}
+library(stringr)
+library(tidytext)
+library(magrittr)
+```
+
+```{r}
+data.qa <- data.q
+
+data.qa %<>%
+  unnest_tokens(word, `State Specific Comments`)
+head(data.qa)
+```
+```{r}
+data(stop_words)
+data.qa <- data.qa %>%
+  anti_join(stop_words)
+head(data.qa)
+```
+```{r}
+dev.new(width = 5, height = 10, unit = "cm")
+p3 <- data.qa %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 100) %>%
+  filter(n < 900) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col(color = "light blue", fill = "light blue") +
+  geom_text(aes(label=n), vjust=-0.3, size=3.5)
+  labs(y = NULL) + theme_minimal()
+
+p3
+
+ggsave("CommentWordFrequency.png")
+```
+
+State specific comments section is an interesting place to look at what is being said about the 
+measures that states report
+
+Words of interest here are "mcos", "ffs", "mco", and "pcc." These are the words that describe the 
+different delivery systems. 
+
+by measure and state plot ffs, pccm, etc. -> pick out insurance types 
+
+```{r}
+delivery.systems <- c("mcos", "ffs", "mco", "pccm")
+```
+```{r}
+
+mq1 <- data.q %>% 
+    filter(!grepl(delivery.systems == "pccm",`State Specific Comments`)) %>%
+    distinct(`Measure Name`)
+
+mql1 <- length(mq1$`Measure Name`)
+mql1
+
+mq2 <- data.q %>% 
+    filter(!grepl(delivery.systems == "mcos",`State Specific Comments`)) %>%
+    distinct(`Measure Name`)
+
+mql2 <- length(mq2$`Measure Name`)
+mql2
+
+mq3 <- data.q %>% 
+    filter(!grepl(delivery.systems == "mco",`State Specific Comments`)) %>%
+    distinct(`Measure Name`)
+
+mql3 <- length(mq3$`Measure Name`)
+mql3
+
+mq4 <- data.q %>% 
+    filter(!grepl(delivery.systems == "ffs",`State Specific Comments`)) %>%
+    distinct(`Measure Name`)
+
+mql4 <- length(mq4$`Measure Name`)
+mql4
+
+mshold <- c(mql1, mql2, mql3, mql4)
+ms4 <- data.frame(delivery.systems, mshold)
+
+p4 <- ggplot(data = ms4, aes(x=mshold, y=delivery.systems)) +
+  geom_bar(stat = "identity", color = "light blue", fill = "light blue") +
+  geom_text(aes(label=mshold), vjust=-0.3, size=3.5) +
+  labs(y="Delivery System", x="Count of Marker Measures")
+  theme_minimal()
+  
+p4
+
+ggsave("DeliverySystem.png")
+```
+
+
+
