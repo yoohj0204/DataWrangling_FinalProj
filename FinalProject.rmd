@@ -1,7 +1,7 @@
 ---
 title: "Final project"
 author: "Xing Cheng, Jihyun Lee, Hyunjoe Yoo"
-date: "11/11/2021"
+date: "11/10/2021"
 output: pdf_document
 ---
 
@@ -18,48 +18,87 @@ library(tidyverse)
 
 ```{r}
 # I will figure out API later
-# res2019 = GET("https://data.medicaid.gov/dataset/e36d89c0-f62e- 56d5-bc7e-b0adf89262b8")
-# res2020=GET("https://data.medicaid.gov/dataset/fbbe1734-b448-4e5a-bc94-3f8688534741")
-# data2019=fromJSON(rawToChar(res2019$content))
+res2019 = GET("https://data.medicaid.gov/api/1/metastore/schemas/dataset/items/e36d89c0-f62e-56d5-bc7e-b0adf89262b8?show-reference-ids=false")
+res2019=fromJSON(rawToChar(res2019$content))
+downloadURL2019=res2019$distribution$data$downloadURL
+data2019=read.csv(downloadURL2019)
 
+res2020=GET("https://data.medicaid.gov/api/1/metastore/schemas/dataset/items/fbbe1734-b448-4e5a-bc94-3f8688534741?show-reference-ids=false")
+res2020=fromJSON(rawToChar(res2020$content))
+downloadURL2020=res2020$distribution$data$downloadURL
+data2020=read.csv(downloadURL2020)
 ```
+
 
 
 
 ```{r}
-#I made some changes here but feel free to change this chunk to run in your computer
-setwd("~/Desktop/QBS181/finalProject/DataWrangling_FinalProj")
-data2019=read.csv("2019data.csv")
-data2020=read.csv("2020data.csv")
-
 data=sqldf("select * from data2019
-      union
+      union all
       select * from data2020")
-
 ```
+
 
 ```{r}
 #Remove dot from column names
 names(data) <- gsub("\\.", "", names(data))
 names(data)
 ```
+Investigated data using excel, I found the column Source is constant value 
+```{r}
+SourceAbb=sqldf("
+select *, row_number() over (order by FFY,Source) as source_id
+from
+(select distinct FFY, Source from data) temp")
+
+```
+
+```{r}
+MeasureInfo=sqldf("
+select distinct MeasureAbbreviation, ReportingProgram, Domain, MeasureName, MeasureType, RateDefinition
+from data
+              ")
+```
+
+```{r}
+StateReport=sqldf("select State, MeasureAbbreviation, data.FFY, source_id, Population, Methodology, StateRate, NumberofStatesReporting, Median, BottomQuartile, TopQuartile, Notes, StateSpecificComments, RateUsedinCalculatingStateMeanandMedian
+      from data, SourceAbb
+      where data.FFY=SourceAbb.FFY and data.Source=SourceAbb.Source")
+```
 
 
 ```{r}
-#Table for kate
-higher=sqldf("select State, avg(StateRate) as StateRate_mean
+#install.packages("usmap")
+library(usmap)
+library(ggplot2)
+
+State_report_freq_2020=sqldf("
+select State as state, count(State) as report_freq
 from data
-where MeasureType like 'Higher%'
+where FFY=2020
 group by State
-order by StateRate_mean desc
+order by report_freq desc
       ")
 
-lower=sqldf("select State, avg(StateRate) as StateRate_mean
+plot_usmap(data=State_report_freq,values='report_freq',color="red")+
+  scale_fill_continuous(low="white",high="blue",name="report freq 2020",label=scales::comma)+
+  theme(legend.position='right')
+```
+
+```{r}
+State_report_freq_2019=sqldf("
+select State as state, count(State) as report_freq
 from data
-where MeasureType like 'Lower%'
+where FFY=2019
 group by State
-order by StateRate_mean
+order by report_freq desc
       ")
+
+plot_usmap(data=State_report_freq,values='report_freq',color="red")+
+  scale_fill_continuous(low="white",high="blue",name="report freq 2019",label=scales::comma)+
+  theme(legend.position='right')
+
+
 ```
 
 

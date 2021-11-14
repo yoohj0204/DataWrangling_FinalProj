@@ -1,0 +1,58 @@
+---
+title: "final_project"
+author: "Hanna Whitehouse"
+date: "11/8/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Reading in the data for higher better and lower better state rates by state.
+```{r}
+higher_better_states<-read.csv("higherbetter_StateRateMean_2019_2020_combine.csv")
+names(higher_better_states)<-c("State","2019","2020")
+lower_better_states<-read.csv("lowerbetter_StateRateMean_2019_2020_combine.csv")
+names(lower_better_states)<-c("State","2019","2020")
+```
+
+boxplot shows the average state rates for all measures in which higher is better in 2019 vs 2020
+
+```{r}
+library(ggplot2)
+library(reshape2)
+long_higher_states<-melt(higher_better_states)
+library(ggpubr)
+ggboxplot(long_higher_states,x="variable",y="value",xlab = F,ylab = "Average State Rate",fill ="variable",palette=c("#320d6d","#ffbfb7"))+theme(legend.position = "none")+labs(caption = "higher rates indicate better measurements")
+
+```
+Bar graphs show the average state rates of all measures in which higher is better in 2019 vs 2020 for randomly selected states.
+```{r}
+set.seed(13)
+random_states<-sample.int(length(higher_better_states$State),8) #indicies of randomly chosen states
+higher_samples<-higher_better_states[random_states,]#subsets the higher better data to a random sample of 8 states
+higher_samples_long<-melt(higher_samples)
+ggplot(higher_samples_long,aes(State,value,fill=variable))+geom_bar(stat = "identity",position="dodge")+theme(plot.caption.position = "plot",axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))+labs(y="Average State Rate",caption = "higher rates indicate better measurements")+scale_fill_manual(values = c("#50514f","#f25f5c"),name="Year")
+
+```
+boxplot shows the average state rates for all measures in which lower is better in 2019 vs 2020
+```{r}
+long_lower_states<-melt(lower_better_states)
+ggboxplot(long_lower_states,x="variable",y="value",xlab = F,ylab = "Average State Rate",fill ="variable",palette=c("#ca2e55","#ffe0b5"))+theme(legend.position = "none")+labs(caption = "lower rates indicate better measurements")
+
+```
+Bar graphs show the average state rates of all measures in which lower is better in 2019 vs 2020 for randomly selected states.
+```{r}
+lower_samples<-lower_better_states[random_states,]#subsets the lower better data to a random sample of 8 states
+lower_samples_long<-melt(lower_samples)
+ggplot(lower_samples_long,aes(State,value,fill=variable))+geom_bar(stat = "identity",position="dodge")+theme(plot.caption.position = "plot",axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))+labs(y="Average State Rate",caption = "lower rates indicate better measurements")+scale_fill_manual(values = c("#413c58","#a3c4bc"),name="Year")
+```
+
+```{r}
+all_data<-rbind(read.csv("2019data.csv"),read.csv("2020data.csv"))#reads in 2019 and 2020 data and combines them
+behavioral_health_data<-all_data[which(all_data$Domain=="Behavioral Health Care"),]#subsets data to only behavioral health care domain
+behavioral_health_high<-behavioral_health_data[which(behavioral_health_data$Measure.Type=="Higher rates are better for this measure"),]#subsets behavioral health data to rates in which higher is a better measure
+behavioral_health_low<-behavioral_health_data[which(behavioral_health_data$Measure.Type=="Lower rates are better for this measure"),]#subsets behavioral health data to rates in which lower is a better measure
+ggplot(all_data,aes(Domain,Number.of.States.Reporting,fill=Domain))+geom_bar(stat = "summary",fun="mean")+theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),legend.position = "none")+labs(y="Mean Num. States Reporting")+scale_fill_manual(values = c("#a7cecb","#8ba6a9","#75704e","#cacc90","#f4ebbe","#f5d5ed"))
+
+```
