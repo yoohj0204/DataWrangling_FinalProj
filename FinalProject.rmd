@@ -220,8 +220,8 @@ write.csv(lower2019_2020,"lowerbetter_StateRateMean_2019_2020_combine.csv", row.
 ```
 ### Avani
 As per a few chosen measures in each domain, how does insurance coverage affect the measures 
-reported on per state? What methodology is chosen for the measure, and how does coverage affect 
-this? Does it change from 2019 to 2020? 
+reported on per state? What methodology is chosen for the measure, and how does coverage 
+affect this?
 
 ```{r}
 #library(sqldf)
@@ -229,6 +229,7 @@ this? Does it change from 2019 to 2020?
 ```
 
 ```{r}
+#pull data sets from the project folder, put them together
 data.ins <- sqldf("select * from X2019data
       union
       select * from X2020data")
@@ -236,6 +237,7 @@ data.ins <- sqldf("select * from X2019data
 Looking at what the domains are available in the dataset
 
 ```{r}
+#Looking at what the domains are available in the dataset
 data.ins$Domain <- as.factor(data.ins$Domain)
 class(data.ins$Domain)
 levels(data.ins$Domain)
@@ -243,6 +245,7 @@ levels(data.ins$Domain)
 
 Looking at what measures are present in domain
 ```{r}
+#cleaning up the type of each variable, converting them into factors
 data.ins$State <- as.factor(data.ins$State)
 data.ins$`Reporting Program` <-as.factor(data.ins$`Reporting Program`)
 data.ins$`Measure Name` <- as.factor(data.ins$`Measure Name`)
@@ -255,6 +258,7 @@ data.ins$Methodology <- as.factor(data.ins$Methodology)
 
 ```
 ```{r}
+#looking at the distinct measures in each domain to select a few as markers of the domain
 filter(data.ins, Domain == "Behavioral Health Care") %>%
   distinct(`Measure Name`)
 ```
@@ -283,8 +287,9 @@ For the purpose of this project, I'll be looking through a select number of meas
 I'll be creating a new table with only these chosen measures
 
 ```{r}
+#measures chosen to encompass the widest population of medicaid and medicare recipients
 chosen.measures <- c("Antidepressant Medication Management: Age 18 and Older", "Follow-Up After Hospitalization for Mental Illness: Age 18 and Older", "Percentage of Eligibles Who Received Preventive Dental Services: Ages 1 to 20", "Contraceptive Care: All Women Ages 21 to 44", "Prenatal and Postpartum Care: Postpartum Care", "Annual Monitoring for Patients on Persistent Medications: Age 18 and Older", "Comprehensive Diabetes Care: Hemoglobin A1c Poor Control (>9.0%): Ages 18 to 75", "National Core Indicators Survey: Age 18 and Older", "Flu Vaccinations for Adults Ages 18 to 64", "Immunizations for Adolescents: Age 13")
-data.q <- data.ins %>%
+data.q <- data.ins %>% #creating a subsetted dataset with our measures
   filter(`Measure Name` %in% chosen.measures)
 
 head(data.q)
@@ -302,6 +307,7 @@ Eligibles", and "Medicaid only"
 We notice that not all measures are represented in all states, so we can look into this
 
 ```{r}
+#example of getting the count of states reporting a specific measure
 st.cnt <- data.q %>% 
   filter(`Measure Name` == "Antidepressant Medication Management: Age 18 and Older") %>%
   distinct(State)
@@ -314,6 +320,8 @@ In this example, we can see that not all fifty states use this measure. We can l
 the measures
 
 ```{r}
+#looping through the measures, repeating the process above to get a vector of the number of 
+#states reporting per measure
 count.hold <- c()
 for (i in 1:10) {
   st.cnt <- data.q %>% 
@@ -334,6 +342,7 @@ st.num
 library(ggplot2)
 ```
 ```{r}
+#Plotting a bar plot of each measure and the count of states reporting that measure
 p1 <- ggplot(data = st.num, aes(x=count.hold, y=chosen.measures)) +
   geom_bar(stat = "identity", color = "light blue", fill = "light blue") +
   geom_text(aes(label=count.hold), vjust=-0.3, size=3.5) +
@@ -350,8 +359,11 @@ levels(data.q$Population)
 ```
 From here, we'll look at frequency of our measures per populations
 ```{r}
+#Distinct values of populations
 pops <- c("CHIP only", "Medicaid & CHIP", "Medicaid & Dual Eligibles", "Medicaid", "Medicaid & CHIP & Dual Eligibles", "Medicaid only")
 
+
+#in a similar way as before, iterate through the populations, and get the distinct count of measures reported
 m.hold <- c()
 
 for (i in 1:6) {
@@ -369,6 +381,7 @@ for (i in 1:6) {
 m.num <- data.frame(pops, m.hold)
 m.num
 
+#plot in a bar plot the populations and distinct count of measures reported
 p2 <- ggplot(data = m.num, aes(x=m.hold, y=pops)) +
   geom_bar(stat = "identity", color = "light blue", fill = "light blue") +
   geom_text(aes(label=m.hold), vjust=-0.3, size=3.5) +
@@ -380,8 +393,9 @@ p2
 ggsave("HealthcarePopulationsPerMeasures.png")
 ```
 Not all coverage populations report on all measures. We can look into this by looking at which 
-specific markers are reported bypopulations
+specific markers are reported by populations
 ```{r}
+#for each population, print out the measures reported
 for (i in 1:6) {
   pop1 <- data.q %>%
     filter(Population == pops[i]) %>%
@@ -407,19 +421,23 @@ library(magrittr)
 ```
 
 ```{r}
+#making a copy fo the subset to use for nlp work
 data.qa <- data.q
 
+#seperate the state specific comments column into individual words
 data.qa %<>%
   unnest_tokens(word, `State Specific Comments`)
 head(data.qa)
 ```
 ```{r}
+#taking out the common english words that do not contribute to the context from the nlp subset
 data(stop_words)
 data.qa <- data.qa %>%
   anti_join(stop_words)
 head(data.qa)
 ```
 ```{r}
+#find the counts of the remaining words, which we can assume are all relevant to the context then plot the frequency fo these words
 dev.new(width = 5, height = 10, unit = "cm")
 p3 <- data.qa %>%
   count(word, sort = TRUE) %>%
@@ -442,15 +460,19 @@ measures that states report
 Words of interest here are "mcos", "ffs", "mco", and "pcc." These are the words that describe the 
 different delivery systems. 
 
+However, it is important to not that these delivery system words are not mentioned as often 
+as other words, but these delivery systems have drastically different word counts according 
+to the frequency chart. Perhaps each delivery system reports a different amount of measures
+
 by measure and state plot ffs, pccm, etc. -> pick out insurance types 
 
 ```{r}
 delivery.systems <- c("mcos", "ffs", "mco", "pccm")
 ```
 ```{r}
-
+#going through each of the delivery systems and getting the counts of measures
 mq1 <- data.q %>% 
-    filter(!grepl(delivery.systems == "pccm",`State Specific Comments`)) %>%
+    filter(!grepl(delivery.systems == "pccm",`State Specific Comments`)) %>% #filter through SSC columns that contain these specific words
     distinct(`Measure Name`)
 
 mql1 <- length(mq1$`Measure Name`)
@@ -478,8 +500,9 @@ mql4 <- length(mq4$`Measure Name`)
 mql4
 
 mshold <- c(mql1, mql2, mql3, mql4)
-ms4 <- data.frame(delivery.systems, mshold)
+ms4 <- data.frame(delivery.systems, mshold) #mini data frame that has delivery system and count of measure reported
 
+#plot bar plot to represent mini data frame
 p4 <- ggplot(data = ms4, aes(x=mshold, y=delivery.systems)) +
   geom_bar(stat = "identity", color = "light blue", fill = "light blue") +
   geom_text(aes(label=mshold), vjust=-0.3, size=3.5) +

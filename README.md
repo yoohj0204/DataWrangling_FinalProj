@@ -25,3 +25,53 @@ Top 10% States with top 10% value from the set is calculated for each dataset if
 
 APIs to be updated.
 <br />
+
+
+**Insurance Coverage Analysis**
+As per a few chosen measures in each domain, how does insurance coverage affect the measures 
+reported on per state? What methodology is chosen for the measure, and how does coverage 
+affect this?
+
+First, we look into what domains are presented in this dataset. These Domains are the fields 
+of healthcare that are represented in the measures for analysis throughout this data set.
+
+Once we understand what domains are available, we select one to two measures per domain to use
+as our sample set for analysis. These measures were selected with the goal of representing the
+widest set of medicaid and medicare recipients.
+
+In order to select the measures, this column had to converted from character values to factors
+
+Once the measures are selected, a subsetted data set is created for analysis which contains 
+only the selected measures
+
+population coloumn gives the coverage types so it is important to see what is represented here
+
+In order to get the count of states reporting each measure in our sample of measures, we 
+filter by measure, get the distinct value of states, get the length of the distinct states, 
+put these values in a vector, and presenting the findings in a barplot, using ggplot
+
+Looking at the specific coverage populations, we can calculate how many measures in our sample
+are represented in each coverage population using the same mechanism as above, then 
+representing our findings with a barplot.
+
+There is another column, state specific comments, which is filled with natural language. we 
+can delve deep here and see in depth how delivery system, which is what is talked about in 
+this column, affects how many measures in our subset is reported.
+
+firstly, we make a copy of the subsetted data, then seperate the state specific comments 
+sections word by word. Then, we remove common english words that do not contribute to the 
+context of the sentence. Next you calculate the frequency of the remaining words and plot 
+these frequency
+
+However, it is important to note that these delivery system words are not mentioned as often 
+as other words, but these delivery systems have drastically different word counts according 
+to the frequency chart. Perhaps each delivery system reports a different amount of measures
+
+Finally, we filter through the main subsetted data set using the delivery systems (looking 
+through the state specific comments section) and get the counts of the measures in our sample 
+set. We plot these findings in a bar plot 
+
+
+
+
+
