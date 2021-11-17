@@ -69,8 +69,24 @@ to the frequency chart. Perhaps each delivery system reports a different amount 
 
 Finally, we filter through the main subsetted data set using the delivery systems (looking 
 through the state specific comments section) and get the counts of the measures in our sample 
-set. We plot these findings in a bar plot 
+set. We plot these findings in a bar plot
 
+According to the insurance analysis, it seems that 
+neither coverage population, which is the subgroup of 
+Medicare and Medicaid insurance a recipient may fall 
+into, nor delivery system, which is the resources and 
+institutions a recipient has access to, affect which 
+measures states report.
+
+Concerning insurance coverage, there were limitations 
+in the data, specifically the lack of having the 
+delivery system as a factor for each of the measures 
+reported. Delivery system was only mentioned in 
+comments, and not for every entry. Further studies 
+could include this, and future statistical analysis 
+would be able to be conducted on both population and 
+delivery system to see if they significantly affect 
+which measures are reported
 
 
 
