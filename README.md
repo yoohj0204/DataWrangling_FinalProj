@@ -3,11 +3,13 @@
 **Dataset and Analysis**
 
 
-The Child and Adult Healthcare Quality Measures Quality data set is a collection of measures used to appraise healthcare per state. Every state is displayed with the measures they have used to appraise the quality of care in different domains of healthcare
+The Child and Adult Healthcare Quality Measures Quality data set is a collection of measures used to appraise healthcare per state. Every state is displayed with the measures they have used to appraise the quality of care in different domains of healthcare. The dataset consists of many different types of measurements which are split into two categories: higher rates are better and lower rates are better. Higher rates are better measurements are measurments in which a higher rate indicates better outcomes such as number of follow-ups after hospitalization. Lower rates are better measurments are measurments in which a lower rate indicates better outcomes such as number of complications after discharge.
 
 We want to compare how healthcare quality is measured across different states, as well compare not only how healthcare has improved over a year, using the 2019 and 2020 versions of this dataset, but also, how reporting how the quality of healthcare has changed.
 
 We want to see how insurance coverage affects the measures chosen and reported on per state, as well as what methodology is chosen for the measure, and how coverage affects this.
+
+This will allow us to identify areas where healthcare measurments are in need of improvment such as which domains of healthcare are lacking measurments and which states need more reporting measurments. Measuring healthcare performance is important to the overall quality of healthcare in order to constantly amend delivery of care to better provide for patients.
 <br />
 
 **final_project_hw**
@@ -71,7 +73,13 @@ Finally, we filter through the main subsetted data set using the delivery system
 through the state specific comments section) and get the counts of the measures in our sample 
 set. We plot these findings in a bar plot 
 
+**Final Takeaways,Limitations, Future Work**
 
+One domain of healthcare which could be improved long-term services and supports. This area had the lower number of mean state reporting measurments so to accurately assess the quality of healhcare in this domain, we need more reporting for it.
+
+One limitation was that the dataset contained many different types of measurments so it is difficult to compare them even if they are in the same category of higher is better or lower is better. 
+
+Future work would include statistically analyzing the data to see if results are significant and looking into specific measurements.
 
 
 
