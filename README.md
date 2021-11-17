@@ -3,11 +3,13 @@
 **Dataset and Analysis**
 
 
-The Child and Adult Healthcare Quality Measures Quality data set is a collection of measures used to appraise healthcare per state. Every state is displayed with the measures they have used to appraise the quality of care in different domains of healthcare
+The Child and Adult Healthcare Quality Measures Quality data set is a collection of measures used to appraise healthcare per state. Every state is displayed with the measures they have used to appraise the quality of care in different domains of healthcare. The dataset consists of many different types of measurements which are split into two categories: higher rates are better and lower rates are better. Higher rates are better measurements are measurements in which a higher rate indicates better outcomes such as number of follow-ups after hospitalization. Lower rates are better measurements are measurements in which a lower rate indicates better outcomes such as number of complications after discharge.
 
 We want to compare how healthcare quality is measured across different states, as well compare not only how healthcare has improved over a year, using the 2019 and 2020 versions of this dataset, but also, how reporting how the quality of healthcare has changed.
 
 We want to see how insurance coverage affects the measures chosen and reported on per state, as well as what methodology is chosen for the measure, and how coverage affects this.
+
+This will allow us to identify areas where healthcare measurements are in need of improvement such as which domains of healthcare are lacking measurements and which states need more reporting measurements. Measuring healthcare performance is important to the overall quality of healthcare in order to constantly amend delivery of care to better provide for patients.
 <br />
 
 **final_project_hw**
@@ -28,11 +30,11 @@ APIs to be updated.
 
 
 **Insurance Coverage Analysis**
-As per a few chosen measures in each domain, how does insurance coverage affect the measures 
-reported on per state? What methodology is chosen for the measure, and how does coverage 
+As per a few chosen measures in each domain, how does insurance coverage affect the measures
+reported on per state? What methodology is chosen for the measure, and how does coverage
 affect this?
 
-First, we look into what domains are presented in this dataset. These Domains are the fields 
+First, we look into what domains are presented in this dataset. These Domains are the fields
 of healthcare that are represented in the measures for analysis throughout this data set.
 
 Once we understand what domains are available, we select one to two measures per domain to use
@@ -41,53 +43,52 @@ widest set of medicaid and medicare recipients.
 
 In order to select the measures, this column had to converted from character values to factors
 
-Once the measures are selected, a subsetted data set is created for analysis which contains 
+Once the measures are selected, a subsetted data set is created for analysis which contains
 only the selected measures
 
-population coloumn gives the coverage types so it is important to see what is represented here
+population column gives the coverage types so it is important to see what is represented here
 
-In order to get the count of states reporting each measure in our sample of measures, we 
-filter by measure, get the distinct value of states, get the length of the distinct states, 
+In order to get the count of states reporting each measure in our sample of measures, we
+filter by measure, get the distinct value of states, get the length of the distinct states,
 put these values in a vector, and presenting the findings in a barplot, using ggplot
 
 Looking at the specific coverage populations, we can calculate how many measures in our sample
-are represented in each coverage population using the same mechanism as above, then 
+are represented in each coverage population using the same mechanism as above, then
 representing our findings with a barplot.
 
-There is another column, state specific comments, which is filled with natural language. we 
-can delve deep here and see in depth how delivery system, which is what is talked about in 
+There is another column, state specific comments, which is filled with natural language. we
+can delve deep here and see in depth how delivery system, which is what is talked about in
 this column, affects how many measures in our subset is reported.
 
-firstly, we make a copy of the subsetted data, then seperate the state specific comments 
-sections word by word. Then, we remove common english words that do not contribute to the 
-context of the sentence. Next you calculate the frequency of the remaining words and plot 
+firstly, we make a copy of the subsetted data, then separate the state specific comments
+sections word by word. Then, we remove common English words that do not contribute to the
+context of the sentence. Next you calculate the frequency of the remaining words and plot
 these frequency
 
-However, it is important to note that these delivery system words are not mentioned as often 
-as other words, but these delivery systems have drastically different word counts according 
+However, it is important to note that these delivery system words are not mentioned as often
+as other words, but these delivery systems have drastically different word counts according
 to the frequency chart. Perhaps each delivery system reports a different amount of measures
 
-Finally, we filter through the main subsetted data set using the delivery systems (looking 
-through the state specific comments section) and get the counts of the measures in our sample 
+Finally, we filter through the main subsetted data set using the delivery systems (looking
+through the state specific comments section) and get the counts of the measures in our sample
 set. We plot these findings in a bar plot
 
-According to the insurance analysis, it seems that 
-neither coverage population, which is the subgroup of 
-Medicare and Medicaid insurance a recipient may fall 
-into, nor delivery system, which is the resources and 
-institutions a recipient has access to, affect which 
+According to the insurance analysis, it seems that
+neither coverage population, which is the subgroup of
+Medicare and Medicaid insurance a recipient may fall
+into, nor delivery system, which is the resources and
+institutions a recipient has access to, affect which
 measures states report.
 
-Concerning insurance coverage, there were limitations 
-in the data, specifically the lack of having the 
-delivery system as a factor for each of the measures 
-reported. Delivery system was only mentioned in 
-comments, and not for every entry. Further studies 
-could include this, and future statistical analysis 
-would be able to be conducted on both population and 
-delivery system to see if they significantly affect 
+Concerning insurance coverage, there were limitations
+in the data, specifically the lack of having the
+delivery system as a factor for each of the measures
+reported. Delivery system was only mentioned in
+comments, and not for every entry. Further studies
+could include this, and future statistical analysis
+would be able to be conducted on both population and
+delivery system to see if they significantly affect
 which measures are reported
 
-
-
-
+Future work would include statistically analyzing the data to see if results are significant and looking into specific measurements.
+<br />
